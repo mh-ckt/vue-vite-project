@@ -1,6 +1,5 @@
 // src/router/index.js
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-
 import Home from '@/views/home.vue'
 
 // 2. 定义路由规则
@@ -12,12 +11,11 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/issues-list',
     component: () => import('@/views/issues.vue'),
-    children: [
-      {
-        path: 'issues1',
-        component: () => import('@/issues-list/issues01.vue'),
-      },
-    ],
+  },
+  {
+    path: '/issues/:id',
+    name: 'IssueDetail',
+    component: () => import('@/issues-list/issueDetail.vue'),
   },
 ]
 
