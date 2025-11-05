@@ -1,9 +1,7 @@
 // src/router/index.js
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 
-import Home from '@/views/Home.vue'
-import Issues from '@/views/issues.vue'
-import IssuesList from '@/issues-list/index.vue'
+import Home from '@/views/home.vue'
 
 // 2. 定义路由规则
 const routes: RouteRecordRaw[] = [
@@ -13,7 +11,7 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/issues-list',
-    component: Issues,
+    component: () => import('@/views/issues.vue'),
     children: [
       {
         path: 'issues1',
