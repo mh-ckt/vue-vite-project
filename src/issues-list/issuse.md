@@ -147,3 +147,54 @@ const handleSayHello = () => {
 如果全局方法较多，可封装为插件，插件方式更适合大型项目，便于管理和按需引入。
 
 注意：上面的 getCurrentInstance 是 Vue 内部 API，官方文档明确指出其主要用于开发 Vue 插件或库，不建议在应用代码中直接使用。
+
+## vue 怎么实现强制刷新组件？
+
+1. 修改组件的 key 属性（最推荐）
+
+Vue 会根据 key 值判断组件是否为 “新组件”：当 key 变化时，组件会被销毁并重新创建（触发完整的生命周期），从而实现强制刷新,简洁高效，不依赖特殊 API，适用于绝大多数场景。
+
+```vue
+<template>
+  <Issues03Child1 :key="childKey" />
+  <button @click="handleRefresh1">通过key值刷新组件1</button>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+let childKey = ref(1)
+const handleRefresh1 = () => {
+  childKey.value += 1
+}
+</script>
+```
+
+2. 通过 v-if 控制组件销毁与重建
+
+利用 v-if 的特性：当值为 false 时组件被销毁，重新设为 true 时重新创建，实现完全重置。适用场景：需要彻底清空组件状态（如表单重置、数据完全刷新）。
+
+```vue
+<template>
+  <Issues03Child1 v-if="isVisible" />
+  <button @click="handleRefresh2">通过v-if刷新组件1</button>
+</template>
+
+<script setup>
+import { ref, nextTick } from 'vue'
+let childKey = ref(1)
+let isVisible = ref(true)
+
+const handleRefresh2 = async () => {
+  isVisible.value = false
+  await nextTick()
+  isVisible.value = true
+}
+</script>
+```
+
+注意事项： 第二种使用 v-if 去强制刷新组件的时候，需要调用 nextTick(),这是由于 vue 对于 DOM 的更新采用的“批量更新”的策略，当响应式数据变化时（比如 isVisible.value = false），Vue 会将 DOM 更新操作放入一个 “队列” 中，等待当前同步代码执行完毕后，再统一处理队列中的更新，最终一次性渲染到 DOM。
+
+这意味着：
+
+1. 执行 isVisible.value = false 后，组件并不会立即被销毁，DOM 也不会立即更新。
+2. 如果不等待 DOM 实际更新，直接紧接着执行 isVisible.value = true，Vue 会认为这两次数据变化是 “连续的”，可能会优化掉中间的销毁过程（相当于没变化），导致组件不会重新创建。
