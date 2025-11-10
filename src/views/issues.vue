@@ -12,9 +12,23 @@ const toRouter = (id: string) => {
 </script>
 
 <template>
-  <div v-for="item in IssuesList">
-    <p @click="toRouter(item.id)" :key="item.id" :to="item.link">
-      {{ item.title }}
-    </p>
-  </div>
+  <p
+    v-for="item in IssuesList"
+    class="issues-title"
+    @click="toRouter(item.id)"
+    :key="item.id"
+    :to="item.link"
+  >
+    {{ item.title }}
+  </p>
 </template>
+
+<style lang="less">
+.issues-title {
+  cursor: pointer;
+}
+
+.issues-title:hover {
+  color: @primary-color;
+}
+</style>
